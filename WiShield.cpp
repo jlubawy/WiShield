@@ -43,12 +43,12 @@ extern "C" {
   void stack_process(void);
 }
 
-#include "WProgram.h"
+#include "Arduino.h"
 #include "WiShield.h"
 
-boolean WiShield::init(U8 seconds)
+bool WiShield::init(U8 seconds)
 {
-	boolean retVal = false;
+	bool retVal = false;
 	zg_init();
 
 #ifdef USE_DIG0_INTR
@@ -73,9 +73,9 @@ boolean WiShield::init(U8 seconds)
 			break;
 		}
 	}
-	
+
 	stack_init();
-	
+
 	return retVal;
 }
 

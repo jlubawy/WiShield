@@ -35,7 +35,7 @@
  *****************************************************************************/
 
 
-#include "WProgram.h"
+#include "Arduino.h"
 #include "WiServer.h"
 
 extern "C" {
@@ -54,18 +54,18 @@ extern "C" {
 #define LF 10
 
 // Strings stored in program memory (defined in strings.c)
-extern const prog_char httpOK[];
-extern const prog_char httpNotFound[];
-extern const prog_char http10[];
-extern const prog_char post[];
-extern const prog_char get[];
-extern const prog_char authBasic[];
-extern const prog_char host[];
-extern const prog_char userAgent[];
-extern const prog_char contentTypeForm[];
-extern const prog_char contentLength[];
-extern const prog_char status[];
-extern const prog_char base64Chars[];
+extern const char httpOK[];
+extern const char httpNotFound[];
+extern const char http10[];
+extern const char post[];
+extern const char get[];
+extern const char authBasic[];
+extern const char host[];
+extern const char userAgent[];
+extern const char contentTypeForm[];
+extern const char contentLength[];
+extern const char status[];
+extern const char base64Chars[];
 
 
 /* GregEigsti - jrwifi submitted WiServer stability fix */
@@ -81,7 +81,7 @@ char txPin = -1;
 char rxPin = -1;
 
 /* Enables basic log messages via Serial */
-boolean verbose = false;
+bool verbose = false;
 
 
 void Server::init(pageServingFunction function) {
@@ -154,7 +154,7 @@ void setRXPin(byte value) {
 }
 
 
-void Server::enableVerboseMode(boolean enable) {
+void Server::enableVerboseMode(bool enable) {
     verbose = enable;
 }
 
@@ -211,7 +211,7 @@ void Server::printTime(long t) {
 /*
  * Writes a byte to the virtual buffer for the current connection
  */
-void Server::write(uint8_t b) {
+size_t Server::write(uint8_t b) {
 
 	// Make sure there's a current connection
 	if (uip_conn) {
@@ -268,7 +268,7 @@ void send() {
  * server request.  It also sets the request's isValid flag if the
  * URL has been saved and an empty line is found.
  */
-boolean processLine(char* data, int len) {
+bool processLine(char* data, int len) {
 
 	// Check for a valid GET line
 	if ((uip_conn->appstate.request == NULL) && (strncmp(data, "GET /", 4) == 0)) {
@@ -281,7 +281,7 @@ boolean processLine(char* data, int len) {
 			if (' ' == *data) {
 				// Replace the space with a NULL to terminate it
 				*(data++) = '\0';
-			
+
 				// GregEigsti - jrwifi submitted WiServer stability fix
 				// Compute length of the URL including the NULL
 				len = len >= WISERVER_GET_STRING_MAX ? WISERVER_GET_STRING_MAX - 1 : data - start;
@@ -312,7 +312,7 @@ boolean processLine(char* data, int len) {
  * This function looks for CR/LF (or just LF) and calls processLine
  * with each line of data found.
  */
-boolean processPacket(char* data, int len) {
+bool processPacket(char* data, int len) {
 
 	// Address after the last byte of data
 	char* end = data + len;
@@ -374,12 +374,12 @@ void sendPage() {
 }
 
 
-boolean Server::sendInProgress() {
+bool Server::sendInProgress() {
 	return false; // FIX ME
 }
 
 
-boolean Server::clientIsLocal() {
+bool Server::clientIsLocal() {
 	// Check if there is a current connection
 	if (uip_conn != NULL) {
 		// Check if the remote host is local to the server
@@ -652,7 +652,7 @@ char getChar(int nibble) {
 }
 
 void storeBlock(char* src, char* dest, int len) {
-	
+
 	dest[0] = getChar(src[0] >> 2);
 	dest[1] = getChar(((src[0] & 0x03) << 4) | ((src[1] & 0xf0) >> 4));
 	dest[2] = len > 1 ? getChar(((src[1] & 0x0f) << 2) | ((src[2] & 0xc0) >> 6)) : '=';
@@ -660,14 +660,14 @@ void storeBlock(char* src, char* dest, int len) {
 }
 
 char* Server::base64encode(char* data) {
-	
+
 	int len = strlen(data);
 	int outLenPadded = ((len + 2) / 3) << 2;
 	char* out = (char*)malloc(outLenPadded + 1);
-	
+
 	char* outP = out;
 	while (len > 0) {
-		
+
 		storeBlock(data, outP, min(len,3));
 		outP += 4;
 		data += 3;
